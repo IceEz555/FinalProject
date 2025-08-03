@@ -178,7 +178,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-ap-southeast-2-71442201-972f",
-                "S3Key": "serverless/smart-home-energy-monitor/prod/1754200671768-2025-08-03T05:57:51.768Z/dailyDataArchive.zip"
+                "S3Key": "serverless/smart-home-energy-monitor/prod/1754206221690-2025-08-03T07:30:21.690Z/dailyDataArchive.zip"
               },
               "Handler": "functions/cron-rotate-daily.handler",
               "Runtime": "nodejs18.x",
@@ -213,7 +213,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-ap-southeast-2-71442201-972f",
-                "S3Key": "serverless/smart-home-energy-monitor/prod/1754200671768-2025-08-03T05:57:51.768Z/graphql.zip"
+                "S3Key": "serverless/smart-home-energy-monitor/prod/1754206221690-2025-08-03T07:30:21.690Z/graphql.zip"
               },
               "Handler": "functions/graphql/graphql.handler",
               "Runtime": "nodejs18.x",
@@ -422,7 +422,7 @@
               "GraphqlLambdaPermissionApiGateway"
             ]
           },
-          "ApiGatewayDeployment1754200640834": {
+          "ApiGatewayDeployment1754206189441": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -997,7 +997,7 @@
   },
   "package": {
     "individually": true,
-    "artifactDirectoryName": "serverless/smart-home-energy-monitor/prod/1754200671768-2025-08-03T05:57:51.768Z",
+    "artifactDirectoryName": "serverless/smart-home-energy-monitor/prod/1754206221690-2025-08-03T07:30:21.690Z",
     "artifact": ""
   }
 }

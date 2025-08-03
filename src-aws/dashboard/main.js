@@ -150,6 +150,11 @@ function processData(rawData) {
     data.push([new Date(date), watts]);
   }
 
+  if (data.length === 0) {
+    console.log("No data to process. Exiting.");
+    return; 
+  }
+
   if (chart) {
     chart.updateOptions({
       file: data,
