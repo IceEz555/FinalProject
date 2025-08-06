@@ -13,6 +13,7 @@
     <!-- 3. เพิ่มไลบรารีกราฟ (Chart.js และ Dygraphs) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jstat@1.9.5/dist/jstat.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.css" />
 
@@ -131,11 +132,11 @@
                     <div class="flex items-center justify-between">
                         <h3 class="text-lg font-semibold text-gray-800">✨ AI Energy Insights</h3>
                         <button id="get-insights-btn" class="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-500 to-indigo-600 rounded-lg shadow-sm hover:from-purple-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            รับคำแนะนำ
+                            Get Insights
                         </button>
                     </div>
                     <p class="mt-4 text-gray-600" id="ai-insights-placeholder">
-                        กดปุ่มเพื่อรับการวิเคราะห์และเคล็ดลับการประหยัดพลังงานจาก AI
+                        Click "Get Insights" to analyze your energy usage patterns and receive personalized recommendations.
                     </p>
                 </div>
                 <!-- +++ END: การ์ดใหม่สำหรับ AI Insights +++ -->
@@ -144,19 +145,20 @@
         </main>
     </div>
 
-    <!-- +++ START: Modal สำหรับแสดงผล AI Insights +++ -->
+  <!-- +++ START: Modal สำหรับแสดงผล AI Insights +++ -->
     <div id="ai-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 modal-backdrop flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl modal-content transform scale-95">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl modal-content transform scale-95 flex flex-col">
             <div class="p-6 border-b flex justify-between items-center">
                 <h2 class="text-xl font-semibold text-gray-800">✨ AI Energy Insights</h2>
                 <button id="close-modal-btn" class="text-gray-400 hover:text-gray-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
-            <div class="p-6">
+            <!-- แก้ไข: เพิ่ม max-h-[60vh] และ overflow-y-auto -->
+            <div class="p-6 overflow-y-auto" style="max-height: 70vh;">
                 <div id="modal-content-area" class="text-gray-700 space-y-4">
                     <!-- เนื้อหาจาก AI จะถูกใส่ที่นี่ -->
-                     <div class="flex items-center justify-center h-32">
+                    <div class="flex items-center justify-center h-32">
                         <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-500"></div>
                     </div>
                 </div>

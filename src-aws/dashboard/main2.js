@@ -153,7 +153,7 @@ async function getEnergyInsights() {
   // 3. เรียกใช้ Gemini API
   let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
   const payload = { contents: chatHistory };
-  const apiKey = ""; // ไม่ต้องใส่ API Key ที่นี่
+  const apiKey = "AIzaSyAp9i5QmDyaZt0pS1opv0wE1tbvSQ9Qt_4"; // ไม่ต้องใส่ API Key ที่นี่
   const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
   try {
@@ -189,11 +189,13 @@ async function getEnergyInsights() {
       text = result.candidates[0].content.parts[0].text;
     }
 
-    // 4. แสดงผลลัพธ์ใน Modal
-    document.getElementById("modal-content-area").innerHTML = text.replace(
-      /\n/g,
-      "<br>"
-    );
+    // --- START: แก้ไขส่วนนี้ ---
+    // 4. แปลง Markdown เป็น HTML แล้วแสดงผล
+    const converter = new showdown.Converter();
+    const html = converter.makeHtml(text);
+    document.getElementById("modal-content-area").innerHTML = html;
+    // --- END: แก้ไขส่วนนี้ ---
+
   } catch (error) {
     console.error("Error fetching AI insights:", error);
     document.getElementById("modal-content-area").innerText =
@@ -308,17 +310,13 @@ async function initUsageChart() {
 async function initChart() {
   await fetchData();
   chart = new Dygraph(document.getElementById("graphdiv"), data, {
-    // --- START: แก้ไขส่วนนี้ ---
-    colors: ["#8B5CF6"], // เปลี่ยนเป็นสีม่วงอ่อน (Violet)
-    strokeWidth: 1.5, // กลับไปใช้ความหนาปกติ
-    gridLineColor: "#e5e7eb",
-    // --- END: แก้ไขส่วนนี้ ---
+    colors: ["#8B5CF6"],
     legend: "always",
     labels: ["Timestamp", "Watts"],
     underlayCallback: highlightNightHours,
     drawCallback: updateMetricsForSelectedRange,
     showRoller: true,
-    rollPeriod: 14, // กลับไปใช้ค่าเริ่มต้น
+    rollPeriod: 14,
   });
 
   document
