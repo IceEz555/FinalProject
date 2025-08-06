@@ -92,10 +92,9 @@ function fetchChartDataForDailyUsage() {
 
 function fetchData(since) {
   if (!since) {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    yesterday.setHours(yesterday.getHours() + 12);
-    since = yesterday.getTime() / 1000;
+    const safeTimeAgo = new Date();
+    safeTimeAgo.setMinutes(safeTimeAgo.getMinutes() - (23 * 60 + 50)); // 23h 50m ago
+    since = safeTimeAgo.getTime() / 1000;
   }
 
   since = parseInt(since);
@@ -378,6 +377,48 @@ async function initUsageChart() {
   });
 }
 
+
+// เพิ่มฟังก์ชันนี้เข้าไปใน dashboard/main.js
+
+async function fetchHistoricalData(startTimestamp, endTimestamp) {
+  console.log(`Fetching historical data from ${startTimestamp} to ${endTimestamp}`);
+
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        const json = JSON.parse(xhr.response);
+        if (json.data && json.data.readings) {
+          // แปลงข้อมูลให้อยู่ในรูปแบบที่ Dygraphs ใช้งานได้
+          const formattedData = json.data.readings.map(entry => {
+            return [new Date(entry.timestamp * 1000), parseFloat(entry.reading)];
+          });
+          resolve(formattedData);
+        } else {
+          console.error("Historical data not found in response:", json);
+          resolve([]); // ส่งค่าว่างกลับไปถ้าไม่เจอข้อมูล
+        }
+      } else {
+        console.log("The request for historical data failed!");
+        reject();
+      }
+    };
+    xhr.open("POST", BASE_URL);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    // ใช้ query 'readings' ที่รับ startDate และ endDate ได้
+    xhr.send(
+      JSON.stringify({
+        query: `query {
+          readings(startDate: ${startTimestamp}, endDate: ${endTimestamp}) {
+            timestamp
+            reading
+          }
+        }`,
+      })
+    );
+  });
+}
+
 async function initChart() {
   // First fetch some data from ThingSpeak
   await fetchData();
@@ -393,26 +434,59 @@ async function initChart() {
   });
 
   // Add callbacks to the buttons "yesterday" and "today"
-  document.getElementById("btnYesterday").addEventListener("click", () => {
-    const start = new Date();
-    start.setDate(start.getDate() - 1);
-    start.setHours(0);
-    start.setMinutes(0);
+// แก้ไขส่วนของปุ่ม "Yesterday" ใน dashboard/main.js
 
+document.getElementById("btnYesterday").addEventListener("click", async () => {
+  toggleLoadingIndicator(true);
+
+  // คำนวณช่วงเวลาของเมื่อวาน (เที่ยงคืนถึงเที่ยงคืน)
+  const start = new Date();
+  start.setDate(start.getDate() - 1);
+  start.setHours(0, 0, 0, 0);
+
+  const end = new Date(start);
+  end.setHours(23, 59, 59, 999);
+
+  const startTimestamp = Math.floor(start.getTime() / 1000);
+  const endTimestamp = Math.floor(end.getTime() / 1000);
+
+  // เรียกฟังก์ชันใหม่เพื่อดึงข้อมูลของเมื่อวาน
+  const historicalData = await fetchHistoricalData(startTimestamp, endTimestamp);
+
+  if (chart && historicalData.length > 0) {
+    // อัปเดตกราฟด้วยข้อมูลใหม่ทั้งหมดของเมื่อวาน
     chart.updateOptions({
-      dateWindow: [start.getTime(), start.getTime() + 24 * 60 * 60 * 1000],
+      file: historicalData,
+      dateWindow: null // ล้างการซูมเก่าออกเพื่อให้แสดงข้อมูลทั้งหมดที่ได้มา
     });
-  });
+  } else {
+    // *** เพิ่ม alert เพื่อให้เห็นชัดเจนว่าหาข้อมูลไม่เจอ ***
+    alert("ไม่พบข้อมูลการใช้งานของเมื่อวาน (No data returned for yesterday)");
+    console.log("No data returned for yesterday.");
+  }
 
-  document.getElementById("btnToday").addEventListener("click", () => {
-    const start = new Date();
-    start.setHours(0);
-    start.setMinutes(0);
+  toggleLoadingIndicator(false);
+});
 
+document.getElementById("btnToday").addEventListener("click", async () => {
+  toggleLoadingIndicator(true);
+
+  // 1. ล้างข้อมูลเก่าในตัวแปร data ทิ้ง
+  data = []; 
+  
+  // 2. เรียกใช้ฟังก์ชัน fetchData() เพื่อดึงข้อมูล 24 ชั่วโมงล่าสุดมาใหม่
+  // เหมือนกับตอนที่โหลดหน้าเว็บครั้งแรก
+  await fetchData(); 
+
+  // 3. รีเซ็ตการซูมของกราฟ เพื่อให้แสดงข้อมูลใหม่ทั้งหมด
+  if (chart) {
     chart.updateOptions({
-      dateWindow: [start.getTime(), start.getTime() + 24 * 60 * 60 * 1000],
+      dateWindow: null 
     });
-  });
+  }
+
+  toggleLoadingIndicator(false);
+});
 
   // 	document.getElementById('btnGetSignature').addEventListener('click', () => {
   // 		if(chart.dateWindow_){

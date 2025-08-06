@@ -99,7 +99,7 @@ async function writeUsageToDynamoDB(usageObj){
     }catch(e){
         console.log('Error writing daily usage to DynamoDB:');
         console.log(e);
-
+        
         // To prevent the application from crashing completely, we
         // return an valid DynamoDB result object with no entries.
         return false

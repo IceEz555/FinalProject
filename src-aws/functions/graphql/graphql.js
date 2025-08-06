@@ -2,6 +2,7 @@ const { graphql, buildSchema } = require('graphql');
 const { usageData } = require('./resolvers/usageData'); // ตัวอย่าง
 const { realtime } = require('./resolvers/realtime'); // <-- 1. เพิ่มบรรทัดนี้
 const { stats } = require('./resolvers/stats');
+const { readings } = require('./resolvers/readings'); // <-- 2. เพิ่มบรรทัดนี้
 // import resolver ตัวอื่น ๆ เช่นเดียวกัน
 
 const schema = buildSchema(`
@@ -28,8 +29,9 @@ const schema = buildSchema(`
 
 const resolvers = {
   usageData,
-   realtime, // 
-  stats,    //
+   realtime, //
+  stats,
+  readings,   //
   // เพิ่ม resolver ตัวอื่น ๆ ที่ประกาศ
 };
 

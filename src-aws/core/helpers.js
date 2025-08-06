@@ -48,10 +48,6 @@ module.exports.parseDynamoDBReadingsToJson = function (data) {
     const timestamp = entry.sortkey;
     const readings = entry.readings;
 
-    // Calculate the time of the first entry, assuming that a
-    // measurement is taken every second. We do -2 because js
-    // starts counting from 0 and because the last element should
-    // not be included.
     let timeForEntry = entry.sortkey - readings.length - 2;
 
     for (const reading of readings) {
@@ -67,11 +63,6 @@ module.exports.parseDynamoDBReadingsToJson = function (data) {
   return output;
 };
 
-/**
- * Convert the output from DynamoDB (which is a JSON object)
- * into a string containing a CSV document with timestamp and
- * measurement column.
- */
 module.exports.parseDynamoDBItemsToCSV = function (dynamoData) {
   let output = "Timestamp,Watts\n";
 
@@ -84,52 +75,85 @@ module.exports.parseDynamoDBItemsToCSV = function (dynamoData) {
   return output;
 };
 
-	module.exports.getReadingsFromDynamoDBSince = async function (
-	deviceId,
-	timestamp
-	) {
-	// ไม่ต้อง require ซ้ำ เพราะ import ไว้ด้านบนแล้ว
-    const { dynamoDocClient } = require('./aws-connections');
-	const { config } = require('./config');
+module.exports.getReadingsFromDynamoDBSince = async function (
+  deviceId,
+  timestamp
+) {
+  const { dynamoDocClient } = require('./aws-connections');
+  const { config } = require('./config');
 
-	// *** แก้ไขสำหรับ AWS SDK v3: ใช้ client.send(new QueryCommand(params)) ***
-	const params = {
-		TableName: config.dynamoDb.table,
-		KeyConditionExpression: "#key = :key and #sortkey > :timestamp",
-		ScanIndexForward: true, // DESC order
-		ConsistentRead: false,
-		ExpressionAttributeNames: {
-		"#key": "primarykey",
-		"#sortkey": "sortkey",
-		},
-		ExpressionAttributeValues: {
-		":key": "reading-" + deviceId,
-		":timestamp": timestamp,
-		},
-	};
-	const data = await dynamoDocClient.send(new QueryCommand(params));
+  const params = {
+    TableName: config.dynamoDb.table,
+    KeyConditionExpression: "#key = :key and #sortkey > :timestamp",
+    ScanIndexForward: true, 
+    ConsistentRead: false,
+    ExpressionAttributeNames: {
+      "#key": "primarykey",
+      "#sortkey": "sortkey",
+    },
+    ExpressionAttributeValues: {
+      ":key": "reading-" + deviceId,
+      ":timestamp": timestamp,
+    },
+  };
+  const data = await dynamoDocClient.send(new QueryCommand(params));
 
-	return module.exports.parseDynamoDBReadingsToJson(data);
-	};
+  return module.exports.parseDynamoDBReadingsToJson(data);
+};
+
+// +++ START: เพิ่มฟังก์ชันใหม่สำหรับปุ่ม Yesterday +++
+module.exports.getReadingsFromDynamoDBByDateRange = async function (
+  deviceId,
+  startDate,
+  endDate
+) {
+  const params = {
+    TableName: config.dynamoDb.table,
+    KeyConditionExpression: "#key = :key and #sortkey BETWEEN :start AND :end",
+    ScanIndexForward: true,
+    ConsistentRead: false,
+    ExpressionAttributeNames: {
+      "#key": "primarykey",
+      "#sortkey": "sortkey",
+    },
+    ExpressionAttributeValues: {
+      ":key": "reading-" + deviceId,
+      ":start": startDate,
+      ":end": endDate,
+    },
+  };
+
+  // เพิ่มโค้ดดีบักเพื่อช่วยตรวจสอบปัญหา
+  console.log('[DEBUG] Querying DynamoDB for historical readings with params:', JSON.stringify(params, null, 2));
+  
+  try {
+    const data = await dynamoDocClient.send(new QueryCommand(params));
+    console.log('[DEBUG] DynamoDB returned item count:', data.Items ? data.Items.length : 0);
+    return module.exports.parseDynamoDBReadingsToJson(data);
+  } catch (error) {
+    console.error('[ERROR] Failed to query DynamoDB for historical readings:', error);
+    return []; // ส่งค่าว่างกลับไปหากเกิดข้อผิดพลาด
+  }
+};
+// +++ END: ฟังก์ชันใหม่สำหรับปุ่ม Yesterday +++
+
 
 module.exports.getUsageDataFromDynamoDB = async function (
   deviceId,
   startDate,
   endDate
 ) {
-  // ไม่ต้อง require ซ้ำ เพราะ import ไว้ด้านบนแล้ว
-    const { dynamoDocClient } = require('./aws-connections');
-    const { config } = require('./config');
+  const { dynamoDocClient } = require('./aws-connections');
+  const { config } = require('./config');
 
-  // *** แก้ไขสำหรับ AWS SDK v3: ใช้ client.send(new QueryCommand(params)) ***
   const params = {
     TableName: config.dynamoDb.table,
     KeyConditionExpression: "#key = :key and #sortkey BETWEEN :start AND :end",
-    ScanIndexForward: true, // DESC order
+    ScanIndexForward: true,
     ConsistentRead: false,
     ExpressionAttributeNames: {
-	"#key": "primarykey",
-    "#sortkey": "sortkey",
+      "#key": "primarykey",
+      "#sortkey": "sortkey",
     },
     ExpressionAttributeValues: {
       ":key": "summary-day-" + deviceId,
@@ -144,16 +168,14 @@ module.exports.getUsageDataFromDynamoDB = async function (
 };
 
 module.exports.writeToS3 = async function (filename, contents) {
-  // ไม่ต้อง require ซ้ำ เพราะ import ไว้ด้านบนแล้ว
-    const { s3 } = require('./aws-connections');
-    const { config } = require('./config');
+  const { s3 } = require('./aws-connections');
+  const { config } = require('./config');
   const util = require("util");
   const zlib = require("zlib");
   const gzip = util.promisify(zlib.gzip);
 
   const compressedBody = await gzip(contents);
 
-  // *** แก้ไขสำหรับ AWS SDK v3: ใช้ client.send(new PutObjectCommand(params)) ***
   const params = {
     Body: compressedBody,
     Bucket: config.s3.bucket,
@@ -163,11 +185,9 @@ module.exports.writeToS3 = async function (filename, contents) {
 };
 
 module.exports.readFromS3 = function (filename) {
-  // ไม่ต้อง require ซ้ำ เพราะ import ไว้ด้านบนแล้ว
-    const { s3 } = require('./aws-connections');
-    const { config } = require('./config');
+  const { s3 } = require('./aws-connections');
+  const { config } = require('./config');
 
-  // *** แก้ไขสำหรับ AWS SDK v3: ใช้ client.send(new GetObjectCommand(params)) ***
   const params = {
     Bucket: config.s3.bucket,
     Key: filename,
@@ -181,27 +201,19 @@ module.exports.getDatesBetween = function (startDate, endDate) {
   let currentDate = startDate;
   while (currentDate <= endDate) {
     dateArray.push(new Date(currentDate));
-    currentDate = currentDate.addDays(1); // ตรวจสอบว่า addDays มีการประกาศไว้ที่ไหน
+    currentDate = currentDate.addDays(1); // โค้ดส่วนนี้ยังคงมี Bug อยู่ตามที่คุณต้องการ
   }
 
   return dateArray;
 };
 
-/**
- * Write a given object to the given table name. Returns a
- * promise that should be awaited.
- */
 module.exports.writeToDynamoDB = function (tableName, object) {
-  // ไม่ต้อง require ซ้ำ เพราะ import ไว้ด้านบนแล้ว
-    const { dynamoDocClient } = require('./aws-connections');
-
-  // *** แก้ไขสำหรับ AWS SDK v3: ใช้ client.send(new PutCommand(params)) ***
-  // ต้อง import PutCommand จาก @aws-sdk/lib-dynamodb ด้วย
-    const { PutCommand } = require("@aws-sdk/lib-dynamodb"); // ควร import ไว้ด้านบนพร้อม QueryCommand
+  const { dynamoDocClient } = require('./aws-connections');
+  const { PutCommand } = require("@aws-sdk/lib-dynamodb");
 
   const params = {
     TableName: tableName,
     Item: object,
   };
-  return dynamoDocClient.send(new PutCommand(params)); // ต้องแน่ใจว่า PutCommand ถูก import แล้ว
+  return dynamoDocClient.send(new PutCommand(params));
 };
