@@ -472,16 +472,16 @@ document.getElementById("btnToday").addEventListener("click", async () => {
   toggleLoadingIndicator(true);
 
   // 1. ล้างข้อมูลเก่าในตัวแปร data ทิ้ง
-  data = []; 
+  data = [];
   
   // 2. เรียกใช้ฟังก์ชัน fetchData() เพื่อดึงข้อมูล 24 ชั่วโมงล่าสุดมาใหม่
   // เหมือนกับตอนที่โหลดหน้าเว็บครั้งแรก
-  await fetchData(); 
+  await fetchData();
 
   // 3. รีเซ็ตการซูมของกราฟ เพื่อให้แสดงข้อมูลใหม่ทั้งหมด
   if (chart) {
     chart.updateOptions({
-      dateWindow: null 
+      dateWindow: null
     });
   }
 

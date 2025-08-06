@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy Reports</title>
+    <!-- ใช้ CSS และ Font ชุดเดียวกับ Dashboard -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- ใช้แค่ Chart.js สำหรับหน้านี้ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.bundle.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+<body>
+
+<div class="flex h-screen">
+
+    <!-- Sidebar (เมนูนำทางด้านซ้าย) -->
+    <aside class="w-64 bg-slate-50 flex flex-col">
+        <div class="p-6 text-2xl font-semibold text-blue-700">
+            ⚡️ Energy Monitor
+        </div>
+        <nav class="flex-1 p-4 space-y-2">
+            <!-- เปลี่ยน Active Link มาที่ Reports -->
+            <a href="index2.html" class="flex items-center px-4 py-2 text-gray-700 hover:bg-slate-200 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
+                Dashboard
+            </a>
+            <a href="reports.html" class="flex items-center px-4 py-2 text-white bg-blue-600 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 4a3 3 0 00-3 3v6a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3H5zm-1 9v-1h5v2H5a1 1 0 01-1-1zm7 1h4a1 1 0 001-1v-1h-5v2zm0-4h5V8h-5v2zM4 8h5v2H4V8z" clip-rule="evenodd" /></svg>
+                Reports
+            </a>
+            <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-slate-200 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0L7.86 5.89c-.32.13-.65.3-.98.5l-2.73.99c-1.5.55-2.14 2.31-1.28 3.6l1.6 2.28c.22.31.38.65.46 1.01l.49 2.19c.28 1.25 1.86 1.86 3.03 1.28l2.4-1.21c.33-.17.7-.17 1.03 0l2.4 1.21c1.17.59 2.75-.03 3.03-1.28l.49-2.19c.08-.36.24-.7.46-1.01l1.6-2.28c.86-1.29.22-3.05-1.28-3.6l-2.73-.99a8.64 8.64 0 00-.98-.5L11.49 3.17zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" /></svg>
+                Settings
+            </a>
+        </nav>
+    </aside>
+
+    <!-- ส่วนแสดงผลหลัก -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Header -->
+        <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+            <h1 class="text-xl font-semibold text-gray-800">Reports</h1>
+            <div id="loading-indicator" style="display: none;">
+                <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-500"></div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-x-hidden overflow-y-auto p-6">
+            <!-- ส่วนควบคุมและตัวกรอง -->
+            <div class="bg-white p-4 rounded-lg shadow mb-6 flex items-center space-x-4">
+                <div>
+                    <label for="start-date" class="block text-sm font-medium text-gray-700">Start Date</label>
+                    <input type="date" id="start-date" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                </div>
+                <div>
+                    <label for="end-date" class="block text-sm font-medium text-gray-700">End Date</label>
+                    <input type="date" id="end-date" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                </div>
+                <div class="pt-6">
+                    <button id="generate-report-btn" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg shadow-sm hover:bg-indigo-700">Generate Report</button>
+                </div>
+                 <div class="pt-6 ml-auto">
+                    <button id="download-csv-btn" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50" disabled>Download CSV</button>
+                </div>
+            </div>
+
+            <!-- ส่วนแสดงผล Report (จะแสดงหลังกดปุ่ม) -->
+            <div id="report-content" class="hidden">
+                <!-- การ์ดสรุปข้อมูล -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-sm font-medium text-gray-500">Total Usage</h3>
+                        <p class="mt-2 text-3xl font-bold text-gray-900" id="summary-total-kwh">... kWh</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-sm font-medium text-gray-500">Estimated Cost</h3>
+                        <p class="mt-2 text-3xl font-bold text-gray-900" id="summary-est-cost">... THB</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-sm font-medium text-gray-500">Average Daily Usage</h3>
+                        <p class="mt-2 text-3xl font-bold text-gray-900" id="summary-avg-kwh">... kWh</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-sm font-medium text-gray-500">Peak Day</h3>
+                        <p class="mt-2 text-3xl font-bold text-gray-900" id="summary-peak-day">...</p>
+                    </div>
+                </div>
+
+                <!-- กราฟและตาราง -->
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                    <div class="lg:col-span-3 bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Daily Usage Chart</h3>
+                        <div class="h-96">
+                             <canvas id="report-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow">
+                         <h3 class="text-lg font-semibold text-gray-800 mb-4">Daily Data</h3>
+                         <div class="overflow-y-auto h-96">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Day (kWh)</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Night (kWh)</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total (kWh)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="report-table-body" class="bg-white divide-y divide-gray-200">
+                                    <!-- ข้อมูลจะถูกใส่ที่นี่ด้วย JavaScript -->
+                                </tbody>
+                            </table>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="report.js"></script>
+</body>
+</html>
