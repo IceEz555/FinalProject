@@ -6,8 +6,6 @@ const { readings } = require('./resolvers/readings'); // <-- 2. เพิ่ม�
 // import resolver ตัวอื่น ๆ เช่นเดียวกัน
 
 const schema = buildSchema(`
-
-  
   type Query {
     usageData(startDate: Int!, endDate: Int!): [DailySummary]!
     stats: Stats!

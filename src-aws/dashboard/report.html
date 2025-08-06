@@ -24,25 +24,23 @@
 <div class="flex h-screen">
 
     <!-- Sidebar (เมนูนำทางด้านซ้าย) -->
-    <aside class="w-64 bg-slate-50 flex flex-col">
-        <div class="p-6 text-2xl font-semibold text-blue-700">
+<aside class="w-64 bg-white shadow-md flex flex-col">
+        <div class="p-6 text-2xl font-bold text-indigo-600 border-b">
             ⚡️ Energy Monitor
         </div>
         <nav class="flex-1 p-4 space-y-2">
-            <!-- เปลี่ยน Active Link มาที่ Reports -->
-            <a href="index2.html" class="flex items-center px-4 py-2 text-gray-700 hover:bg-slate-200 rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
+            <a href="index2.html" class="flex items-center px-4 py-2 text-gray-700 bg-gray-200 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
                 Dashboard
             </a>
-            <a href="reports.html" class="flex items-center px-4 py-2 text-white bg-blue-600 rounded-lg">
+            <a href="report.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 4a3 3 0 00-3 3v6a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3H5zm-1 9v-1h5v2H5a1 1 0 01-1-1zm7 1h4a1 1 0 001-1v-1h-5v2zm0-4h5V8h-5v2zM4 8h5v2H4V8z" clip-rule="evenodd" /></svg>
                 Reports
             </a>
-            <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-slate-200 rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0L7.86 5.89c-.32.13-.65.3-.98.5l-2.73.99c-1.5.55-2.14 2.31-1.28 3.6l1.6 2.28c.22.31.38.65.46 1.01l.49 2.19c.28 1.25 1.86 1.86 3.03 1.28l2.4-1.21c.33-.17.7-.17 1.03 0l2.4 1.21c1.17.59 2.75-.03 3.03-1.28l.49-2.19c.08-.36.24-.7.46-1.01l1.6-2.28c.86-1.29.22-3.05-1.28-3.6l-2.73-.99a8.64 8.64 0 00-.98-.5L11.49 3.17zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" /></svg>
-                Settings
-            </a>
         </nav>
+        <div class="p-4 border-t mt-auto">
+            <p class="text-xs text-gray-500">Last Reading: <span id="last-reading">...</span></p>
+        </div>
     </aside>
 
     <!-- ส่วนแสดงผลหลัก -->
