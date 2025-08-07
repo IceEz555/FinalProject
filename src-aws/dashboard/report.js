@@ -1,7 +1,7 @@
 // =================================================================
 // การตั้งค่าและตัวแปร
 // =================================================================
-const BASE_URL = "xxxx";
+const BASE_URL = "https://jcjmov2wp8.execute-api.ap-southeast-2.amazonaws.com/prod/graphql";
 const KWH_PRICE = 4.0; // สมมติว่าค่าไฟหน่วยละ 4 บาท
 let reportChart;
 let reportData = [];
