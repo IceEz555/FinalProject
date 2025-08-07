@@ -2,7 +2,7 @@
 // ส่วนที่ 1: การตั้งค่าและตัวแปรส่วนกลาง (Global Variables)
 // =================================================================
 const BASE_URL =
-  "https://jcjmov2wp8.execute-api.ap-southeast-2.amazonaws.com/prod/graphql";
+  "xxxx"; // URL ของ API ที่ใช้ดึงข้อมูล
 let data = [];
 let chart;
 let animateDuration = 1500;
@@ -153,7 +153,7 @@ async function getEnergyInsights() {
   // 3. เรียกใช้ Gemini API
   let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
   const payload = { contents: chatHistory };
-  const apiKey = "AIzaSyAp9i5QmDyaZt0pS1opv0wE1tbvSQ9Qt_4"; // ไม่ต้องใส่ API Key ที่นี่
+  const apiKey = "xxx"; // ต้องใส่ API Key ที่นี่
   const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
   try {
