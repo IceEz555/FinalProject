@@ -416,10 +416,18 @@ function hideModal() {
 }
 // +++ END: ฟังก์ชันสำหรับควบคุม Modal +++
 
-function toggleLoadingIndicator(visible) {
-  const $el = document.getElementById("loading-indicator");
-  $el.style.display = visible ? "block" : "none";
+// --- START: แก้ไขฟังก์ชันนี้ให้ทำงานกับ spinner ใหม่ ---
+function toggleLoadingIndicator(show) {
+  const spinner = document.getElementById("spinner");
+  if (spinner) { // เพิ่มการตรวจสอบว่า element มีอยู่จริงหรือไม่
+    if (show) {
+      spinner.classList.remove("hidden");
+    } else {
+      spinner.classList.add("hidden");
+    }
+  }
 }
+// --- END: แก้ไขฟังก์ชันนี้ ---
 
 function formatTimestampForChartAxis(rawTimestamp) {
   const date = new Date(rawTimestamp * 1000);
