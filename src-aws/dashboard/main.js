@@ -2,7 +2,7 @@
 // ส่วนที่ 1: การตั้งค่าและตัวแปรส่วนกลาง (Global Variables)
 // =================================================================
 const BASE_URL =
-  "XXXXX";
+  "https://jcjmov2wp8.execute-api.ap-southeast-2.amazonaws.com/prod/graphql";
 let data = [];
 let chart;
 let animateDuration = 1500;
