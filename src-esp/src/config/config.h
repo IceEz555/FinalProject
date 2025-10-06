@@ -21,7 +21,7 @@
  * The voltage of your home, used to calculate the wattage.
  * Try setting this as accurately as possible.
  */
-#define HOME_VOLTAGE 230
+#define HOME_VOLTAGE 220
 
 /**
  * WiFi credentials

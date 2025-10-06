@@ -2,9 +2,43 @@
 // การตั้งค่าและตัวแปร
 // =================================================================
 const BASE_URL = "https://jcjmov2wp8.execute-api.ap-southeast-2.amazonaws.com/prod/graphql";
-const KWH_PRICE = 4.0; // สมมติว่าค่าไฟหน่วยละ 4 บาท
 let reportChart;
 let reportData = [];
+
+/**
+ * คำนวณค่าไฟฟ้าตามโครงสร้างอัตราก้าวหน้าและค่า Ft
+ * @param {number} totalKwh - จำนวนหน่วยไฟฟ้าที่ใช้ทั้งหมด (kWh)
+ * @returns {number} - ค่าไฟฟ้าโดยประมาณ (บาท)
+ */
+function calculateEstimatedCost(totalKwh) {
+    const KWH_RATES = {
+        tier1: 3.2484, // 150 หน่วยแรก
+        tier2: 4.2218, // 151 - 400 หน่วย
+        tier3: 4.4217, // 401 หน่วยขึ้นไป
+    };
+    const FT_RATE = 0.3672; // 36.72 สตางค์/หน่วย
+    const VAT_RATE = 0.07;// 7%
+
+    let energyCharge = 0;
+
+    if (totalKwh <= 150) {
+        energyCharge = totalKwh * KWH_RATES.tier1;
+    } else if (totalKwh <= 400) {
+        energyCharge = (150 * KWH_RATES.tier1) +
+                       ((totalKwh - 150) * KWH_RATES.tier2);
+    } else {
+        energyCharge = (150 * KWH_RATES.tier1) +
+                       (250 * KWH_RATES.tier2) +
+                       ((totalKwh - 400) * KWH_RATES.tier3);
+    }
+
+    const ftCharge = totalKwh * FT_RATE;
+    const subTotal = energyCharge + ftCharge;
+    const vat = subTotal * VAT_RATE;
+    const totalCost = subTotal + vat;
+
+    return totalCost;
+}
 
 // =================================================================
 // DOM Elements
@@ -109,7 +143,7 @@ function fetchUsageData(startTimestamp, endTimestamp) {
  */
 function updateSummaryCards(data) {
     const totalKwh = data.reduce((sum, item) => sum + item.dayUse + item.nightUse, 0);
-    const estimatedCost = totalKwh * KWH_PRICE;
+    const estimatedCost = calculateEstimatedCost(totalKwh);
     const avgKwh = totalKwh / data.length;
 
     let peakUsage = 0;

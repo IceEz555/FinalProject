@@ -33,7 +33,7 @@ void setup()
 #endif
 
     // Initialize emon library
-  emon1.current(ADC_INPUT, 6.99);
+  emon1.current(ADC_INPUT, 88.27);
 
   // i2c for the OLED panel
   Wire.begin(5, 4);
